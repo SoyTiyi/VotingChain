@@ -1,0 +1,30 @@
+{
+  "name": "voting-mechanism",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "test": "mocha"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@metamask/detect-provider": "^1.2.0",
+    "@truffle/hdwallet-provider": "^1.7.0",
+    "fs-extra": "^10.0.0",
+    "ganache-cli": "^6.12.2",
+    "mocha": "^9.1.3",
+    "next": "^12.0.4",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "semantic-ui-css": "^2.4.1",
+    "semantic-ui-icon": "^2.3.3",
+    "semantic-ui-react": "^2.0.4",
+    "solc": "^0.6.12",
+    "web3": "^1.6.1"
+  }
+}
