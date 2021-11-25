@@ -4,8 +4,8 @@ pragma solidity ^0.6.5;
 contract VotingFactory{
     address[] public deployedVoting;
 
-    function createVoting() public {
-        address newVoting = address(new Voting(msg.sender));
+    function createVoting(string memory _description, string memory _purpose) public {
+        address newVoting = address(new Voting(msg.sender, _description, _purpose));
         deployedVoting.push(newVoting);
     }
 
@@ -28,10 +28,14 @@ contract Voting{
     mapping(address => bool) public voters;
     uint private candidatesCount;
     uint private votesCount;
+    string public description;
+    string public purpose;
     address public manager;
 
-    constructor(address _manager) public {
+    constructor(address _manager, string memory _description, string memory _purpose) public {
         manager = _manager;
+        description = _description;
+        purpose = _purpose;
     }
 
     function getCandidatesCount() view public returns(uint){
