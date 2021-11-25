@@ -17,11 +17,11 @@ beforeEach(async () => {
   factory = await new web3.eth
     .Contract(compiledVotingFactory.abi)
     .deploy({ data: compiledVotingFactory.evm.bytecode.object })
-    .send({ from: accounts[0], gas: '1000000' });
+    .send({ from: accounts[0], gas: '2000000' });
 
-  await factory.methods.createVoting().send({
+  await factory.methods.createVoting("description","purpose").send({
     from: accounts[0],
-    gas: '1000000',
+    gas: '2000000'
   });
   
   [votingAddress] = await factory.methods.getDeployedVoting().call();
