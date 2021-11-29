@@ -17,6 +17,7 @@ contract VotingFactory{
 contract Voting{
 
     struct Candidate{
+        string name;
         string studies;
         string description;
         address candidateAddress;
@@ -38,6 +39,10 @@ contract Voting{
         purpose = _purpose;
     }
 
+    function getSummary() view public returns( string memory, string memory,address,uint,uint){
+        return(description,purpose,manager,votesCount,candidatesCount);
+    }
+
     function getCandidatesCount() view public returns(uint){
         return candidatesCount;
     }
@@ -55,9 +60,10 @@ contract Voting{
         votesCount++;
     }
 
-    function addCandidate(string memory _studies, string memory _description, bool _right_wing) public {
+    function addCandidate(string memory _name, string memory _studies, string memory _description, bool _right_wing) public {
         //Adding the new candidate into the mapping
         Candidate storage newCandidate = candidates[candidatesCount];
+        newCandidate.name = _name;
         newCandidate.studies = _studies;
         newCandidate.description = _description;
         newCandidate.candidateAddress = msg.sender;

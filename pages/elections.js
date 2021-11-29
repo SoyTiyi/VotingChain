@@ -4,8 +4,11 @@ import { Segment, Header, Icon, Button, Grid, Card } from 'semantic-ui-react'
 import 'semantic-ui-css/semantic.min.css'
 import web3 from '../ethereum/web3'
 import factory from '../ethereum/factory'
+import { useRouter } from 'next/dist/client/router'
 
 const elections = (props) => {
+
+  const router = useRouter()
   const listRef = useRef()
   const [votings, setVotigs] = useState([])
 
@@ -26,7 +29,7 @@ const elections = (props) => {
       const items = votings.map((element, index) => {
           return{
               header: element,
-              description: <Button primary floated="left">View</Button>,
+              description: <Button primary floated="left" onClick={() => router.push(`/elections/${element}`)}>View</Button>,
               fluid: true
           }
       })
