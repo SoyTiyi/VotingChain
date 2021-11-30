@@ -3,7 +3,7 @@ import compiledFactory from './build/VotingFactory.json'
 
 const factory = new web3.eth.Contract(
   compiledFactory.abi,
-  '0x6dE4C831D734EA0a08Df13f97270B1798E023Fc1',
+  '0xad8722C319f7C15f7aaC0e93582B09Af3cDd3eD5',
 )
 
 export default factory

@@ -11,8 +11,10 @@ import {
   Form,
   Checkbox,
   Message,
+  Card,
 } from 'semantic-ui-react'
 import 'semantic-ui-css/semantic.min.css'
+import { useRouter } from 'next/dist/client/router'
 
 const electionsDetails = ({
   address,
@@ -35,11 +37,17 @@ const electionsDetails = ({
   const [loading, setLoading] = useState(false)
   const [err, setErr] = useState(false)
   const [message, setMessage] = useState('')
+  const [info, setInfo] = useState(true)
+
+  const router = useRouter()
+
+  console.log(candidates.length)
 
   const createCandidate = async () => {
     try {
       setErr(false)
       setSucc(false)
+      setInfo(false)
       setLoading(true)
       setMessage('Loading your transaction...')
       const accounts = await web3.eth.getAccounts()
@@ -50,7 +58,12 @@ const electionsDetails = ({
       setLoading(false)
       setSucc(true)
       setMessage('Successfully transaction!!!')
-    } catch (error) {}
+      router.push(`/elections/${address}`)
+    } catch (error) {
+      setLoading(false)
+      setErr(true)
+      setMessage('Error to proccess the transaction!!!')
+    }
   }
 
   const handlerNameInput = (event) => {
@@ -78,7 +91,23 @@ const electionsDetails = ({
   }
 
   const renderCandidates = () => {
-    return <p style={{ marginTop: '10px' }}>Not Candidates yet</p>
+    if (candidates.length === 0) {
+      return <p style={{ marginTop: '10px' }}>Not Candidates yet</p>
+    } else {
+      const items = candidates.map((element, index) => {
+        return {
+          header: element.name,
+          description: (<div style={{color: 'black'}}>
+            <p>Votes: {element.votes}</p>
+            <p>Studies: {element.studies}</p>
+            <p>Description: {element.description}</p>
+            <p>Right Wing: {element.right_wing ? 'yes': 'no'}</p>
+            </div>),
+          meta: element.candidateAddress.slice(0,8) + '...'
+        }
+      })
+      return <Card.Group items={items} />
+    }
   }
 
   const handlerRightWingInput = () => {
@@ -225,8 +254,9 @@ const electionsDetails = ({
               color: 'white',
             }}
           />
-
-          {renderCandidates()}
+          <Grid container stackable verticalAlign="middle" style={{marginTop: '10px'}}>
+            <Grid.Row columns="4">{renderCandidates()}</Grid.Row>
+          </Grid>
         </Segment>
       </section>
 
@@ -291,14 +321,26 @@ const electionsDetails = ({
               <Grid.Column width={6} textAlign="center" floated="right">
                 <Grid.Row>
                   <Grid.Column>
-                    <Message>
-                      <Message.Header>Restrictions</Message.Header>
-                      <p>
-                        Only you can enrol as candidate one time, if you try to
-                        re-enrol the application go to show a error message, you
-                        have to be honest to fill this form!!!
-                      </p>
-                    </Message>
+                    {err ? (
+                      <Message negative header="ERROR" content={message} />
+                    ) : loading ? (
+                      <Message info header="Transaction" content={message} />
+                    ) : succ ? (
+                      <Message
+                        positive
+                        header="Success Transaction"
+                        content={message}
+                      />
+                    ) : info ? (
+                      <Message>
+                        <Message.Header>Restrictions</Message.Header>
+                        <p>
+                          Only you can enrol as candidate one time, if you try
+                          to re-enrol the application go to show a error
+                          message, you have to be honest to fill this form!!!
+                        </p>
+                      </Message>
+                    ) : null}
                   </Grid.Column>
                 </Grid.Row>
               </Grid.Column>
