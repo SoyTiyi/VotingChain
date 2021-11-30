@@ -8,9 +8,9 @@ import {
   Button,
   Icon,
   Grid,
-  GridRow,
   Form,
   Checkbox,
+  Message,
 } from 'semantic-ui-react'
 import 'semantic-ui-css/semantic.min.css'
 
@@ -34,23 +34,23 @@ const electionsDetails = ({
   const [succ, setSucc] = useState(false)
   const [loading, setLoading] = useState(false)
   const [err, setErr] = useState(false)
-  const [message, setMessage] = useState("")
+  const [message, setMessage] = useState('')
 
   const createCandidate = async () => {
-      try {
-          setErr(false)
-          setSucc(false)
-          setLoading(true)
-          setMessage("Loading your transaction...")
-          const accounts = await web3.eth.getAccounts()
-          const voting = await Voting(address)
-          await voting.methods.addCandidate(name,studies,desc,rightWing).send({from: accounts[0]})
-          setLoading(false)
-          setSucc(true)
-          setMessage("Successfully transaction!!!")
-      } catch (error) {
-          
-      }
+    try {
+      setErr(false)
+      setSucc(false)
+      setLoading(true)
+      setMessage('Loading your transaction...')
+      const accounts = await web3.eth.getAccounts()
+      const voting = await Voting(address)
+      await voting.methods
+        .addCandidate(name, studies, desc, rightWing)
+        .send({ from: accounts[0] })
+      setLoading(false)
+      setSucc(true)
+      setMessage('Successfully transaction!!!')
+    } catch (error) {}
   }
 
   const handlerNameInput = (event) => {
@@ -288,7 +288,20 @@ const electionsDetails = ({
                   />
                 </Form>
               </Grid.Column>
-              <Grid.Column width={6}></Grid.Column>
+              <Grid.Column width={6} textAlign="center" floated="right">
+                <Grid.Row>
+                  <Grid.Column>
+                    <Message>
+                      <Message.Header>Restrictions</Message.Header>
+                      <p>
+                        Only you can enrol as candidate one time, if you try to
+                        re-enrol the application go to show a error message, you
+                        have to be honest to fill this form!!!
+                      </p>
+                    </Message>
+                  </Grid.Column>
+                </Grid.Row>
+              </Grid.Column>
             </Grid.Row>
           </Grid>
         </Segment>
