@@ -12,6 +12,7 @@ import {
   Checkbox,
   Message,
   Card,
+  Table,
 } from 'semantic-ui-react'
 import 'semantic-ui-css/semantic.min.css'
 import { useRouter } from 'next/dist/client/router'
@@ -28,6 +29,7 @@ const electionsDetails = ({
   const detailRef = useRef()
   const candidatesRef = useRef()
   const addCandidateRef = useRef()
+  const addVoteRef = useRef()
 
   const [name, setName] = useState('')
   const [studies, setStudies] = useState('')
@@ -38,10 +40,51 @@ const electionsDetails = ({
   const [err, setErr] = useState(false)
   const [message, setMessage] = useState('')
   const [info, setInfo] = useState(true)
+  const [loadVote, setLoadVote] = useState(false)
+  const [voteMessage, setVoteMessage] = useState('')
 
   const router = useRouter()
 
   console.log(candidates.length)
+
+  const voteToCandidate = async (index) => {
+    try {
+      setLoadVote(true)
+      setVoteMessage('Processing the vote...')
+      const accounts = await web3.eth.getAccounts()
+      const voting = Voting(address)
+      await voting.methods.addVote(index).send({
+        from: accounts[0],
+      })
+      setLoadVote(false)
+      setVoteMessage('Successfully vote!!!')
+      router.push(`/elections/${address}`)
+    } catch (error) {
+      setLoadVote(false)
+      setVoteMessage('Error to process the vote!!!')
+    }
+  }
+
+  const renderCandidatesToVote = () => {
+    const items = candidates.map((element, index) => {
+      return (
+        <Table.Row key={index}>
+          <Table.Cell>{index + 1}</Table.Cell>
+          <Table.Cell>{element.name}</Table.Cell>
+          <Table.Cell textAlign="center">
+            <Button
+              color="green"
+              loading={loadVote}
+              onClick={() => voteToCandidate(index)}
+              content="Vote"
+            />
+          </Table.Cell>
+        </Table.Row>
+      )
+    })
+
+    return items
+  }
 
   const createCandidate = async () => {
     try {
@@ -90,6 +133,10 @@ const electionsDetails = ({
     addCandidateRef.current.scrollIntoView({ behavior: 'smooth' })
   }
 
+  function goToAddVote() {
+    addVoteRef.current.scrollIntoView({ behavior: 'smooth' })
+  }
+
   const renderCandidates = () => {
     if (candidates.length === 0) {
       return <p style={{ marginTop: '10px' }}>Not Candidates yet</p>
@@ -97,13 +144,15 @@ const electionsDetails = ({
       const items = candidates.map((element, index) => {
         return {
           header: element.name,
-          description: (<div style={{color: 'black'}}>
-            <p>Votes: {element.votes}</p>
-            <p>Studies: {element.studies}</p>
-            <p>Description: {element.description}</p>
-            <p>Right Wing: {element.right_wing ? 'yes': 'no'}</p>
-            </div>),
-          meta: element.candidateAddress.slice(0,8) + '...'
+          description: (
+            <div style={{ color: 'black' }}>
+              <p>Votes: {element.votes}</p>
+              <p>Studies: {element.studies}</p>
+              <p>Description: {element.description}</p>
+              <p>Right Wing: {element.right_wing ? 'yes' : 'no'}</p>
+            </div>
+          ),
+          meta: element.candidateAddress.slice(0, 8) + '...',
         }
       })
       return <Card.Group items={items} />
@@ -213,7 +262,11 @@ const electionsDetails = ({
                         primary
                         onClick={goToAddCandidates}
                       />
-                      <Button content="Add vote" secondary />
+                      <Button
+                        content="Add vote"
+                        secondary
+                        onClick={goToAddVote}
+                      />
                     </div>
                   </Grid.Column>
                 </Grid.Row>
@@ -254,7 +307,12 @@ const electionsDetails = ({
               color: 'white',
             }}
           />
-          <Grid container stackable verticalAlign="middle" style={{marginTop: '10px'}}>
+          <Grid
+            container
+            stackable
+            verticalAlign="middle"
+            style={{ marginTop: '10px' }}
+          >
             <Grid.Row columns="4">{renderCandidates()}</Grid.Row>
           </Grid>
         </Segment>
@@ -343,6 +401,47 @@ const electionsDetails = ({
                     ) : null}
                   </Grid.Column>
                 </Grid.Row>
+              </Grid.Column>
+            </Grid.Row>
+          </Grid>
+        </Segment>
+      </section>
+
+      <section ref={addVoteRef}>
+        <Segment
+          vertical
+          inverted
+          textAlign="center"
+          style={{
+            padding: '2em 0em',
+          }}
+        >
+          <Header
+            as="h2"
+            content="Add Candidate"
+            textAlign="center"
+            style={{
+              fontWeight: 'normal',
+              marginBottom: 0,
+              fontSize: '2em',
+              color: '#3a86ff',
+            }}
+          />
+          <h3>Request List</h3>
+          <Grid container stackable verticalAlign="middle">
+            <Grid.Row>
+              <Grid.Column>
+                <Table celled>
+                  <Table.Header>
+                    <Table.Row textAlign="center">
+                      <Table.HeaderCell>ID</Table.HeaderCell>
+                      <Table.HeaderCell>Name</Table.HeaderCell>
+                      <Table.HeaderCell>Vote</Table.HeaderCell>
+                    </Table.Row>
+                  </Table.Header>
+                  <Table.Body>{renderCandidatesToVote()}</Table.Body>
+                </Table>
+                {<p style={{color: 'white'}}>{voteMessage}</p>}
               </Grid.Column>
             </Grid.Row>
           </Grid>
